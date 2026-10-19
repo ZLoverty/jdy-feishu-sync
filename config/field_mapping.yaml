@@ -1,7 +1,21 @@
 version: 1
-
 identity:
   source_record_id: _id
   target_record_id_field: jdy_id
-
-managed_fields: []
+system_fields:
+  jdy_id:
+    target_id: fldoU2KU3f
+  jdy_deleted:
+    target_id: fldzw3Rda9
+managed_fields:
+- source_id: _widget_1730273046580
+  source_label: PI Code
+  target_id: fldCTHUCzb
+  target_type: 1
+  transform: null
+- source_id: _widget_1731630050822
+  target_id: fldvOJ51XI
+  transform: null
+- source_id: _widget_1730273046583
+  target_id: fldMht0cbQ
+  transform: null

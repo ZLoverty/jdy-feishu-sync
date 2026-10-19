@@ -1,0 +1,255 @@
+version: 1
+identity:
+  source_record_id: _id
+  target_record_id_field: jdy_id
+fields:
+- source_id: _widget_1730273046580
+  source_label: PI Code
+  source_type: text
+  target_id: fldCTHUCzb
+  target_name: PI Code
+  target_type: 1
+  compatibility: compatible
+  status: candidate
+  enabled: false
+  transform: null
+- source_id: _widget_1730273046582
+  source_label: Create Date
+  source_type: datetime
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1731630050822
+  source_label: Status
+  source_type: combo
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1731636467310
+  source_label: PI Code Responsible
+  source_type: user
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1743692004916
+  source_label: PI Code Responsible Team Leader
+  source_type: user
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1730273046584
+  source_label: Material Form
+  source_type: radiogroup
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1730273046583
+  source_label: Material
+  source_type: combo
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1767571539347
+  source_label: Material Code In SKU
+  source_type: text
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1731629910831
+  source_label: Description (EN)
+  source_type: textarea
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1730273046585
+  source_label: 牌号说明 (中文)
+  source_type: textarea
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1743079962925
+  source_label: Formulation Owner
+  source_type: combo
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1742187165107
+  source_label: Open to OEM Product
+  source_type: radiogroup
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1739930600808
+  source_label: Specific Customer PI Code
+  source_type: radiogroup
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1739930600820
+  source_label: Customer List
+  source_type: subform
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1742469951017
+  source_label: Brand Exclusivity
+  source_type: radiogroup
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1742469951019
+  source_label: Brand List
+  source_type: subform
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1730273046586
+  source_label: PI Code in CC Code
+  source_type: text
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1730273261274
+  source_label: Material Code in CC Code
+  source_type: text
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1731630382367
+  source_label: EOL Reason
+  source_type: textarea
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1731630382372
+  source_label: EOL Reason
+  source_type: upload
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1743680928877
+  source_label: Does this PI Code have Color Match Scheme
+  source_type: radiogroup
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1743680928864
+  source_label: PI Code_Formulation配色方案/PI Code_Formulation Color Match Scheme
+  source_type: upload
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1742717869624
+  source_label: Product Demand Code
+  source_type: text
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1742717869625
+  source_label: Product Demand Title
+  source_type: text
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null
+- source_id: _widget_1742717869627
+  source_label: Product Demand Submitter
+  source_type: user
+  target_id: null
+  target_name: null
+  target_type: null
+  compatibility: source_only
+  status: manual_review
+  enabled: false
+  transform: null

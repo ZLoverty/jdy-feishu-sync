@@ -1,8 +1,9 @@
 import httpx
 import pytest
+import uuid
 
 import jdy_feishu_sync.cli as cli
-from jdy_feishu_sync.adapters.feishu import FeishuAPIError, FeishuClient, FeishuConfigurationError, FeishuError, FeishuHTTPError
+from jdy_feishu_sync.adapters.feishu import FeishuAPIError, FeishuClient, FeishuConfigurationError, FeishuError, FeishuHTTPError, FeishuRepeatedRequestError
 from jdy_feishu_sync.config import FeishuSettings
 
 
@@ -104,6 +105,43 @@ def test_http_404_is_distinct_from_business_error():
     with make_client(business_error) as client:
         with pytest.raises(FeishuAPIError, match="API error 1254004"):
             client.get_table()
+
+
+def test_create_uses_uuid4_client_token_and_update_has_no_client_token():
+    requests = []
+
+    def handler(request):
+        if request.url.host == "auth.test":
+            return httpx.Response(200, json={"code": 0, "access_token": "token", "expires_in": 7200})
+        requests.append(request)
+        if request.method == "POST":
+            return httpx.Response(200, json={"code": 0, "data": {"record": {"record_id": "rec1"}}})
+        return httpx.Response(200, json={"code": 0, "data": {"record": {"record_id": "rec1"}}})
+
+    with make_client(handler) as client:
+        token = str(uuid.uuid4())
+        client.create_record({"fld": "value"}, client_token=token)
+        client.update_record("rec1", {"fld": "changed"})
+    assert requests[0].method == "POST"
+    assert requests[0].url.params["client_token"] == token
+    assert uuid.UUID(requests[0].url.params["client_token"]).version == 4
+    assert requests[1].method == "PUT"
+    assert "client_token" not in requests[1].url.params
+
+
+def test_repeated_create_request_is_distinct_and_not_retried():
+    requests = []
+
+    def handler(request):
+        if request.url.host == "auth.test":
+            return httpx.Response(200, json={"code": 0, "access_token": "token", "expires_in": 7200})
+        requests.append(request)
+        return httpx.Response(403, json={"code": 0, "msg": "Same API requests are submitted repeatedly."})
+
+    with make_client(handler) as client:
+        with pytest.raises(FeishuRepeatedRequestError, match="repeated"):
+            client.create_record({"jdy_id": "s1"}, client_token=str(uuid.uuid4()))
+    assert len(requests) == 1
 
 
 def test_repeated_page_token_fails():

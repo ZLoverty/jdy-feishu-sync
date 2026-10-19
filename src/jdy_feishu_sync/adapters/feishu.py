@@ -2,12 +2,20 @@ from __future__ import annotations
 
 import threading
 import time
+import uuid
 from collections.abc import Iterator
 from typing import Any
 
 import httpx
 
 from jdy_feishu_sync.config import FeishuSettings
+
+
+def _is_uuid4(value: str) -> bool:
+    try:
+        return uuid.UUID(value).version == 4
+    except (ValueError, AttributeError):
+        return False
 
 
 class FeishuError(RuntimeError):
@@ -18,6 +26,12 @@ class FeishuHTTPError(FeishuError):
     def __init__(self, status_code: int, message: str):
         super().__init__(f"Feishu HTTP {status_code}: {message}")
         self.status_code = status_code
+
+
+class FeishuRepeatedRequestError(FeishuHTTPError):
+    """Feishu rejected a replayed request carrying an already-used token."""
+
+    category = "repeated_request"
 
 
 class FeishuAPIError(FeishuError):
@@ -86,7 +100,10 @@ class FeishuClient:
             raise FeishuError(f"Unexpected response shape from Feishu {operation}")
         return body
 
-    def _request(self, method: str, path: str, *, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _request(self, method: str, path: str, *, params: dict[str, Any] | None = None, json_body: dict[str, Any] | None = None, retry: bool = True) -> dict[str, Any]:
+        # CREATE is POST and must never be retried by this generic transport.
+        # Its recovery is handled by the journal and exact jdy_id lookup.
+        retry_allowed = retry and method.upper() in {"GET", "PUT", "PATCH", "DELETE"}
         for attempt in range(self.max_retries + 1):
             try:
                 response = self._client.request(
@@ -95,13 +112,14 @@ class FeishuClient:
                     params=params,
                     headers={"Authorization": f"Bearer {self.get_tenant_access_token()}", "Content-Type": "application/json; charset=utf-8"},
                     timeout=self.settings.timeout_seconds,
+                    json=json_body,
                 )
             except httpx.HTTPError as exc:
-                if attempt >= self.max_retries:
+                if not retry_allowed or attempt >= self.max_retries:
                     raise FeishuError(f"Network error calling Feishu {path}: {exc}") from exc
                 time.sleep(min(0.25 * (2**attempt), 2.0))
                 continue
-            if response.status_code in {429, 500, 502, 503, 504} and attempt < self.max_retries:
+            if retry_allowed and response.status_code in {429, 500, 502, 503, 504} and attempt < self.max_retries:
                 time.sleep(min(0.25 * (2**attempt), 2.0))
                 continue
             if response.status_code >= 400:
@@ -112,6 +130,8 @@ class FeishuClient:
                     detail = "request rejected"
                 if response.status_code == 404:
                     detail = f"Not Found: {detail}"
+                if response.status_code == 403 and "repeated" in str(detail).lower():
+                    raise FeishuRepeatedRequestError(response.status_code, str(detail))
                 raise FeishuHTTPError(response.status_code, str(detail))
             body = self._json(response, path)
             if body.get("code", 0) not in (0, "0"):
@@ -150,6 +170,36 @@ class FeishuClient:
     def get_app(self) -> dict[str, Any]:
         """Return Bitable application metadata without accessing a table."""
         return self._request("GET", f"bitable/v1/apps/{self.settings.app_token}")
+
+    def create_record(self, fields: dict[str, Any], *, client_token: str | None = None) -> dict[str, Any]:
+        """Create only the supplied fields; client_token makes retries idempotent."""
+        token = client_token or str(uuid.uuid4())
+        if not _is_uuid4(token):
+            raise ValueError("client_token must be a UUIDv4")
+        data = self._request("POST", f"bitable/v1/apps/{self.settings.app_token}/tables/{self.settings.table_id}/records", params={"client_token": token}, json_body={"fields": fields})
+        record = data.get("record", data)
+        if not isinstance(record, dict):
+            raise FeishuError("Feishu create response does not contain a record")
+        return record
+
+    def update_record(self, record_id: str, fields: dict[str, Any]) -> dict[str, Any]:
+        if not record_id:
+            raise ValueError("record_id must not be empty")
+        data = self._request("PUT", f"bitable/v1/apps/{self.settings.app_token}/tables/{self.settings.table_id}/records/{record_id}", json_body={"fields": fields})
+        record = data.get("record", data)
+        if not isinstance(record, dict):
+            raise FeishuError("Feishu update response does not contain a record")
+        return record
+
+    def create_field(self, field_name: str, field_type: int, property: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Create one approved Bitable field; callers must perform schema preflight."""
+        if not field_name.strip():
+            raise ValueError("field_name must not be empty")
+        data = self._request("POST", f"bitable/v1/apps/{self.settings.app_token}/tables/{self.settings.table_id}/fields", json_body={"field_name": field_name, "type": field_type, "property": property or {}})
+        field = data.get("field", data)
+        if not isinstance(field, dict):
+            raise FeishuError("Feishu create-field response does not contain a field")
+        return field
 
     def list_fields(self) -> list[dict[str, Any]]:
         fields: list[dict[str, Any]] = []

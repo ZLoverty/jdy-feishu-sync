@@ -261,3 +261,9 @@ frontend/.vite/
 backend/static/
 
 tmp/
+# P2 local reports and execution state
+reports/
+*.sqlite
+*.sqlite-journal
+*.lock
+

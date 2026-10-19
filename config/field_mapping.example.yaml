@@ -4,4 +4,14 @@ identity:
   source_record_id: _id
   target_record_id_field: jdy_id
 
+system_fields:
+  jdy_id:
+    target_id: "fld_actual_id"
+  jdy_deleted:
+    target_id: "fld_actual_deleted"
+  jdy_updated_at:
+    target_id: "fld_actual_updated"
+  synced_at:
+    target_id: "fld_actual_synced"
+
 managed_fields: []
