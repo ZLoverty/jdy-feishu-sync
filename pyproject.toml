@@ -7,7 +7,7 @@ name = "jdy-feishu-sync"
 version = "0.1.0"
 description = "Read-only Jiandaoyun integration for the Feishu sync project"
 requires-python = ">=3.11"
-dependencies = ["httpx>=0.25", "python-dotenv>=1.0"]
+dependencies = ["httpx>=0.25", "python-dotenv>=1.0", "PyYAML>=6.0"]
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
